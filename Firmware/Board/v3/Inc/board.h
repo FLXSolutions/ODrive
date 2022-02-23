@@ -23,9 +23,9 @@
 #include <Drivers/STM32/stm32_system.h>
 
 #if HW_VERSION_MINOR <= 3
-#define SHUNT_RESISTANCE (675e-6f)
+#define SHUNT_RESISTANCE (7e-3f)
 #else
-#define SHUNT_RESISTANCE (500e-6f)
+#define SHUNT_RESISTANCE (7e-3f)
 #endif
 
 #define AXIS_COUNT (2)
@@ -37,11 +37,7 @@
 
 #define CAN_FREQ (2000000UL)
 
-#if HW_VERSION_MINOR >= 5 && HW_VERSION_VOLTAGE >= 48
-#define DEFAULT_BRAKE_RESISTANCE (2.0f) // [ohm]
-#else
-#define DEFAULT_BRAKE_RESISTANCE (0.47f) // [ohm]
-#endif
+#define DEFAULT_BRAKE_RESISTANCE (0.0f) // [ohm]
 
 #define DEFAULT_ERROR_PIN 0
 #define DEFAULT_MIN_DC_VOLTAGE 8.0f
@@ -77,14 +73,14 @@
 #define MAX_CONTROL_LOOP_UPDATE_TO_CURRENT_UPDATE_DELTA (TIM_1_8_PERIOD_CLOCKS / 2 + 1 * 128)
 
 #ifdef __cplusplus
-#include <Drivers/DRV8301/drv8301.hpp>
+#include <Drivers/DRV8323/drv8323.hpp>
 #include <Drivers/STM32/stm32_gpio.hpp>
 #include <Drivers/STM32/stm32_spi_arbiter.hpp>
 #include <MotorControl/pwm_input.hpp>
 #include <MotorControl/thermistor.hpp>
 
-using TGateDriver = Drv8301;
-using TOpAmp = Drv8301;
+using TGateDriver = Drv323;
+using TOpAmp = Drv323;
 
 #include <MotorControl/motor.hpp>
 #include <MotorControl/encoder.hpp>

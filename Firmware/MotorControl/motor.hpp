@@ -16,21 +16,21 @@ public:
     // example: current_lim and calibration_current will instead determine the maximum voltage applied to the motor.
     struct Config_t {
         bool pre_calibrated = false; // can be set to true to indicate that all values here are valid
-        int32_t pole_pairs = 7;
-        float calibration_current = 10.0f;    // [A]
+        int32_t pole_pairs = 6;
+        float calibration_current = 3.0f;    // [A]
         float resistance_calib_max_voltage = 2.0f; // [V] - You may need to increase this if this voltage isn't sufficient to drive calibration_current through the motor.
         float phase_inductance = 0.0f;        // to be set by measure_phase_inductance
         float phase_resistance = 0.0f;        // to be set by measure_phase_resistance
-        float torque_constant = 0.04f;         // [Nm/A] for PM motors, [Nm/A^2] for induction motors. Equal to 8.27/Kv of the motor
+        float torque_constant = 0.021343f;         // [Nm/A] for PM motors, [Nm/A^2] for induction motors. Equal to 8.27/Kv of the motor
         MotorType motor_type = MOTOR_TYPE_HIGH_CURRENT;
         // Read out max_allowed_current to see max supported value for current_lim.
         // float current_lim = 70.0f; //[A]
         float current_lim = 10.0f;          //[A]
         float current_lim_margin = 8.0f;    // Maximum violation of current_lim
-        float torque_lim = std::numeric_limits<float>::infinity();           //[Nm]. 
+        float torque_lim = std::numeric_limits<float>::infinity();           //[Nm].
         // Value used to compute shunt amplifier gains
-        float requested_current_range = 60.0f; // [A]
-        float current_control_bandwidth = 1000.0f;  // [rad/s]
+        float requested_current_range = 15.0f; // [A]
+        float current_control_bandwidth = 100.0f;  // [rad/s]
         float inverter_temp_limit_lower = 100;
         float inverter_temp_limit_upper = 120;
 
@@ -39,7 +39,7 @@ public:
         bool acim_autoflux_enable = false;
         float acim_autoflux_attack_gain = 10.0f;
         float acim_autoflux_decay_gain = 1.0f;
-        
+
         bool R_wL_FF_enable = false; // Enable feedforwards for R*I and w*L*I terms
         bool bEMF_FF_enable = false; // Enable feedforward for bEMF
 
@@ -77,6 +77,7 @@ public:
     void update_current_controller_gains();
     void disarm_with_error(Error error);
     bool do_checks(uint32_t timestamp);
+
     float effective_current_lim();
     float max_available_torque();
     std::optional<float> phase_current_from_adcval(uint32_t ADCValue);
@@ -131,7 +132,7 @@ public:
     float direction_ = 0.0f; // if -1 then positive torque is converted to negative Iq
     OutputPort<float2D> Vdq_setpoint_ = {{0.0f, 0.0f}}; // fed to the FOC
     OutputPort<float2D> Idq_setpoint_ = {{0.0f, 0.0f}}; // fed to the FOC
-    
+
     PhaseControlLaw<3>* control_law_;
 };
 

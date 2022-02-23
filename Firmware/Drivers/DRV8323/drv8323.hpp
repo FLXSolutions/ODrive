@@ -1,5 +1,5 @@
-#ifndef __DRV8301_HPP
-#define __DRV8301_HPP
+#ifndef __DRV8323_HPP
+#define __DRV8323_HPP
 
 #include "stdbool.h"
 #include "stdint.h"
@@ -9,7 +9,7 @@
 #include <Drivers/STM32/stm32_gpio.hpp>
 
 
-class Drv8301 : public GateDriverBase, public OpAmpBase {
+class Drv8323 : public GateDriverBase, public OpAmpBase {
 public:
     typedef enum {
         FaultType_NoFault  = (0 << 0),  //!< No fault
@@ -31,7 +31,7 @@ public:
         FaultType_GVDD_OV  = (1 << 23)  //!< DRV8301 Vdd Over Voltage fault
     } FaultType_e;
 
-    Drv8301(Stm32SpiArbiter* spi_arbiter, Stm32Gpio ncs_gpio,
+    Drv8323(Stm32SpiArbiter* spi_arbiter, Stm32Gpio ncs_gpio,
             Stm32Gpio enable_gpio, Stm32Gpio nfault_gpio)
             : spi_arbiter_(spi_arbiter), ncs_gpio_(ncs_gpio),
               enable_gpio_(enable_gpio), nfault_gpio_(nfault_gpio) {}
@@ -46,7 +46,7 @@ public:
      * init().
      */
     bool config(float requested_gain, float* actual_gain);
-    
+
     /**
      * @brief Initializes the gate driver to the configuration prepared with
      * config().
@@ -90,8 +90,8 @@ public:
 
 private:
     enum CtrlMode_e {
-        DRV8301_CtrlMode_Read = 1 << 15,   //!< Read Mode
-        DRV8301_CtrlMode_Write = 0 << 15   //!< Write Mode
+        DRV8323_CtrlMode_Read = 1 << 15,   //!< Read Mode
+        DRV8323_CtrlMode_Write = 0 << 15   //!< Write Mode
     };
 
     enum RegName_e {
@@ -142,4 +142,4 @@ private:
 };
 
 
-#endif // __DRV8301_HPP
+#endif // __DRV8323_HPP
