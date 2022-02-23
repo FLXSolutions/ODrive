@@ -71,7 +71,7 @@ struct BoardConfig_t {
     uint32_t uart_a_baudrate = 115200;
     uint32_t uart_b_baudrate = 115200;
     uint32_t uart_c_baudrate = 115200;
-    bool enable_can_a = true;
+    bool enable_can_a = false;
     bool enable_i2c_a = false;
     ODriveIntf::StreamProtocolType uart0_protocol = ODriveIntf::STREAM_PROTOCOL_TYPE_ASCII_AND_STDOUT;
     ODriveIntf::StreamProtocolType uart1_protocol = ODriveIntf::STREAM_PROTOCOL_TYPE_ASCII_AND_STDOUT;
@@ -90,11 +90,11 @@ struct BoardConfig_t {
      * If enabled, if the measured DC voltage exceeds `dc_bus_overvoltage_ramp_start`,
      * the ODrive will sink more power than usual into the the brake resistor
      * in an attempt to bring the voltage down again.
-     * 
+     *
      * The brake duty cycle is increased by the following amount:
      *  vbus_voltage == dc_bus_overvoltage_ramp_start  =>  brake_duty_cycle += 0%
      *  vbus_voltage == dc_bus_overvoltage_ramp_end  =>  brake_duty_cycle += 100%
-     * 
+     *
      * Remarks:
      *  - This feature is active even when all motors are disarmed.
      *  - This feature is disabled if `brake_resistance` is non-positive.
@@ -108,7 +108,7 @@ struct BoardConfig_t {
                                                                     //!< otherwise the ramp feature is disabled.
 
     float dc_max_positive_current = INFINITY; // Max current [A] the power supply can source
-    float dc_max_negative_current = -0.01f; // Max current [A] the power supply can sink. You most likely want a non-positive value here. Set to -INFINITY to disable.
+    float dc_max_negative_current = -INFINITY; // Max current [A] the power supply can sink. You most likely want a non-positive value here. Set to -INFINITY to disable.
     uint32_t error_gpio_pin = DEFAULT_ERROR_PIN;
     PWMMapping_t pwm_mappings[4];
     PWMMapping_t analog_mappings[GPIO_COUNT];

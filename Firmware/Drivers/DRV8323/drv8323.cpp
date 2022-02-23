@@ -1,10 +1,10 @@
 
-#include "drv8301.hpp"
+#include "drv8323.hpp"
 #include "utils.hpp"
 #include "cmsis_os.h"
 #include "board.h"
 
-const SPI_InitTypeDef Drv8301::spi_config_ = {
+const SPI_InitTypeDef Drv8323::spi_config_ = {
     .Mode = SPI_MODE_MASTER,
     .Direction = SPI_DIRECTION_2LINES,
     .DataSize = SPI_DATASIZE_16BIT,
@@ -18,7 +18,7 @@ const SPI_InitTypeDef Drv8301::spi_config_ = {
     .CRCPolynomial = 10,
 };
 
-bool Drv8301::config(float requested_gain, float* actual_gain) {
+bool Drv8323::config(float requested_gain, float* actual_gain) {
     // Calculate gain setting: Snap down to have equal or larger range as
     // requested or largest possible range otherwise
 
@@ -29,7 +29,7 @@ bool Drv8301::config(float requested_gain, float* actual_gain) {
     // 40V/V on 666uOhm gives a range of +/- 55A
 
     uint16_t gain_setting = 3;
-    float gain_choices[] = {10.0f, 20.0f, 40.0f, 80.0f};
+    float gain_choices[] = {5.0f, 10.0f, 20.0f, 40.0f};
     while (gain_setting && (gain_choices[gain_setting] > requested_gain)) {
         gain_setting--;
     }
@@ -65,7 +65,7 @@ bool Drv8301::config(float requested_gain, float* actual_gain) {
     return true;
 }
 
-bool Drv8301::init() {
+bool Drv8323::init() {
     uint16_t val;
 
     if (state_ == kStateReady) {
@@ -116,17 +116,17 @@ bool Drv8301::init() {
     return state_ == kStateReady;
 }
 
-void Drv8301::do_checks() {
+void Drv8323::do_checks() {
     if (state_ != kStateUninitialized && !nfault_gpio_.read()) {
         state_ = kStateUninitialized;
     }
 }
 
-bool Drv8301::is_ready() {
+bool Drv8323::is_ready() {
     return state_ == kStateReady;
 }
 
-Drv8301::FaultType_e Drv8301::get_error() {
+Drv8323::FaultType_e Drv8323::get_error() {
     uint16_t fault1, fault2;
 
     if (!read_reg(kRegNameStatus1, &fault1) ||
@@ -137,15 +137,15 @@ Drv8301::FaultType_e Drv8301::get_error() {
     return (FaultType_e)((uint32_t)fault1 | ((uint32_t)(fault2 & 0x0080) << 16));
 }
 
-bool Drv8301::read_reg(const RegName_e regName, uint16_t* data) {
-    tx_buf_ = build_ctrl_word(DRV8301_CtrlMode_Read, regName, 0);
+bool Drv8323::read_reg(const RegName_e regName, uint16_t* data) {
+    tx_buf_ = build_ctrl_word(DRV8323_CtrlMode_Read, regName, 0);
     if (!spi_arbiter_->transfer(spi_config_, ncs_gpio_, (uint8_t *)(&tx_buf_), nullptr, 1, 1000)) {
         return false;
     }
-    
+
     delay_us(1);
 
-    tx_buf_ = build_ctrl_word(DRV8301_CtrlMode_Read, regName, 0);
+    tx_buf_ = build_ctrl_word(DRV8323_CtrlMode_Read, regName, 0);
     rx_buf_ = 0xffff;
     if (!spi_arbiter_->transfer(spi_config_, ncs_gpio_, (uint8_t *)(&tx_buf_), (uint8_t *)(&rx_buf_), 1, 1000)) {
         return false;
@@ -160,13 +160,13 @@ bool Drv8301::read_reg(const RegName_e regName, uint16_t* data) {
     if (data) {
         *data = rx_buf_ & 0x07FF;
     }
-    
+
     return true;
 }
 
-bool Drv8301::write_reg(const RegName_e regName, const uint16_t data) {
+bool Drv8323::write_reg(const RegName_e regName, const uint16_t data) {
     // Do blocking write
-    tx_buf_ = build_ctrl_word(DRV8301_CtrlMode_Write, regName, data);
+    tx_buf_ = build_ctrl_word(DRV8323_CtrlMode_Write, regName, data);
     if (!spi_arbiter_->transfer(spi_config_, ncs_gpio_, (uint8_t *)(&tx_buf_), nullptr, 1, 1000)) {
         return false;
     }

@@ -93,7 +93,7 @@ odrive_firmware_pkg = {
         'Drivers/STM32/stm32_nvm.c',
         'Drivers/STM32/stm32_spi_arbiter.cpp',
         'communication/can/can_simple.cpp',
-        'communication/can/odrive_can.cpp',    
+        'communication/can/odrive_can.cpp',
         'communication/communication.cpp',
         'communication/ascii_protocol.cpp',
         'communication/interface_uart.cpp',
@@ -241,7 +241,7 @@ board_v3 = {
     code_files = {
         'startup_stm32f405xx.s',
         '../../ThirdParty/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c',
-        '../../Drivers/DRV8301/drv8301.cpp',
+        '../../Drivers/DRV8323/drv8323.cpp',
         'board.cpp',
         'Src/stm32f4xx_hal_timebase_TIM.c',
         'Src/tim.c',
@@ -363,7 +363,7 @@ elseif boards[boardversion] == nil then
 end
 board = boards[boardversion]
 
--- --not 
+-- --not
 -- TODO: remove this setting
 if tup.getconfig("USB_PROTOCOL") ~= "native" and tup.getconfig("USB_PROTOCOL") ~= "" then
     error("CONFIG_USB_PROTOCOL is deprecated")
@@ -450,7 +450,7 @@ if tup.getconfig('ENABLE_DISASM') == 'true' then
 end
 
 if tup.getconfig('DOCTEST') == 'true' then
-    TEST_INCLUDES = '-I. -I./MotorControl -I./fibre-cpp/include -I./Drivers/DRV8301 -I./doctest'
+    TEST_INCLUDES = '-I. -I./MotorControl -I./fibre-cpp/include -I./Drivers/DRV8323 -I./doctest'
     tup.foreach_rule('Tests/*.cpp', 'g++ -O3 -std=c++17 '..TEST_INCLUDES..' -c %f -o %o', 'Tests/bin/%B.o')
     tup.frule{inputs='Tests/bin/*.o', command='g++ %f -o %o', outputs='Tests/test_runner.exe'}
     tup.frule{inputs='Tests/test_runner.exe', command='%f'}

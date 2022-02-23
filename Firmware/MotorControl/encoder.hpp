@@ -13,18 +13,18 @@ class Encoder;
 class Encoder : public ODriveIntf::EncoderIntf {
 public:
     static constexpr uint32_t MODE_FLAG_ABS = 0x100;
-    static constexpr std::array<float, 6> hall_edge_defaults = 
+    static constexpr std::array<float, 6> hall_edge_defaults =
         {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f};
 
     struct Config_t {
-        Mode mode = MODE_INCREMENTAL;
+        Mode mode = MODE_HALL;
         float calib_range = 0.02f; // Accuracy required to pass encoder cpr check
         float calib_scan_distance = 16.0f * M_PI; // rad electrical
         float calib_scan_omega = 4.0f * M_PI; // rad/s electrical
-        float bandwidth = 1000.0f;
+        float bandwidth = 100.0f;
         int32_t phase_offset = 0;        // Offset between encoder count and rotor electrical phase
         float phase_offset_float = 0.0f; // Sub-count phase alignment offset
-        int32_t cpr = (2048 * 4);   // Default resolution of CUI-AMT102 encoder,
+        int32_t cpr = 36;   // Default resolution of CUI-AMT102 encoder,
         float index_offset = 0.0f;
         bool use_index = false;
         bool pre_calibrated = false; // If true, this means the offset stored in
@@ -36,7 +36,7 @@ public:
         bool use_index_offset = true;
         bool enable_phase_interpolation = true; // Use velocity to interpolate inside the count state
         bool find_idx_on_lockin_only = false; // Only be sensitive during lockin scan constant vel state
-        bool ignore_illegal_hall_state = false; // dont error on bad states like 000 or 111
+        bool ignore_illegal_hall_state = true; // dont error on bad states like 000 or 111
         uint8_t hall_polarity = 0;
         bool hall_polarity_calibrated = false;
         std::array<float, 6> hall_edge_phcnt = hall_edge_defaults;
@@ -57,7 +57,7 @@ public:
     Encoder(TIM_HandleTypeDef* timer, Stm32Gpio index_gpio,
             Stm32Gpio hallA_gpio, Stm32Gpio hallB_gpio, Stm32Gpio hallC_gpio,
             Stm32SpiArbiter* spi_arbiter);
-    
+
     bool apply_config(ODriveIntf::MotorIntf::MotorType motor_type);
     void setup();
     void set_error(Error error);
@@ -118,7 +118,7 @@ public:
     bool pos_estimate_valid_ = false;
     bool vel_estimate_valid_ = false;
 
-    int16_t tim_cnt_sample_ = 0; // 
+    int16_t tim_cnt_sample_ = 0; //
     static const constexpr GPIO_TypeDef* ports_to_sample[] = { GPIOA, GPIOB, GPIOC };
     uint16_t port_samples_[sizeof(ports_to_sample) / sizeof(ports_to_sample[0])];
     // Updated by low_level pwm_adc_cb
