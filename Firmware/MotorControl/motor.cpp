@@ -12,7 +12,7 @@ static constexpr auto CURRENT_ADC_UPPER_BOUND =        (uint32_t)((float)(1 << 1
 /**
  * @brief This control law adjusts the output voltage such that a predefined
  * current is tracked. A hardcoded integrator gain is used for this.
- * 
+ *
  * TODO: this might as well be implemented using the FieldOrientedController.
  */
 struct ResistanceMeasurementControlLaw : AlphaBetaFrameController {
@@ -34,7 +34,7 @@ struct ResistanceMeasurementControlLaw : AlphaBetaFrameController {
             actual_current_ = 0.0f;
             test_voltage_ = 0.0f;
         }
-    
+
         if (std::abs(test_voltage_) > max_voltage_) {
             test_voltage_ = NAN;
             return Motor::ERROR_PHASE_RESISTANCE_OUT_OF_RANGE;
@@ -82,7 +82,7 @@ struct ResistanceMeasurementControlLaw : AlphaBetaFrameController {
  * @brief This control law toggles rapidly between positive and negative output
  * voltage. By measuring how large the current ripples are, the phase inductance
  * can be determined.
- * 
+ *
  * TODO: this method assumes a certain synchronization between current measurement and output application
  */
 struct InductanceMeasurementControlLaw : AlphaBetaFrameController {
@@ -172,7 +172,7 @@ Motor::Motor(TIM_HandleTypeDef* timer,
  *
  * Note that this does not activate the PWM outputs immediately, it just sets
  * a flag so they will be enabled later.
- * 
+ *
  * The sequence goes like this:
  *  - Motor::arm() sets the is_armed_ flag.
  *  - On the next timer update event Motor::timer_update_cb() gets called in an
@@ -183,7 +183,7 @@ Motor::Motor(TIM_HandleTypeDef* timer,
  *    (automatic output enable) bit.
  *  - On the next update event the timer latches the configured values into the
  *    active shadow register and enables the outputs at the same time.
- * 
+ *
  * The sequence can be aborted at any time by calling Motor::disarm().
  *
  * @param control_law: An control law that is called at the frequency of current
@@ -222,7 +222,7 @@ bool Motor::arm(PhaseControlLaw<3>* control_law) {
  * If the motor is armed, the PWM timings come into effect at the next update
  * event (and are enabled if they weren't already), unless the motor is disarmed
  * prior to that.
- * 
+ *
  * @param tentative: If true, the update is not counted as "refresh".
  */
 void Motor::apply_pwm_timings(uint16_t timings[3], bool tentative) {
@@ -236,7 +236,7 @@ void Motor::apply_pwm_timings(uint16_t timings[3], bool tentative) {
         tim->CCR1 = timings[0];
         tim->CCR2 = timings[1];
         tim->CCR3 = timings[2];
-        
+
         if (!tentative) {
             if (is_armed_) {
                 // Set the Automatic Output Enable so that the Master Output Enable
@@ -244,7 +244,7 @@ void Motor::apply_pwm_timings(uint16_t timings[3], bool tentative) {
                 tim->BDTR |= TIM_BDTR_AOE;
             }
         }
-        
+
         // If a timer update event occurred just now while we were updating the
         // timings, we can't be sure what values the shadow registers now contain,
         // so we must disarm the motor.
@@ -258,14 +258,14 @@ void Motor::apply_pwm_timings(uint16_t timings[3], bool tentative) {
 
 /**
  * @brief Disarms the motor PWM.
- * 
+ *
  * After this function returns, it is guaranteed that all three
  * motor phases are floating and will not be enabled again until
  * arm() is called.
  */
 bool Motor::disarm(bool* p_was_armed) {
     bool was_armed;
-    
+
     CRITICAL_SECTION() {
         was_armed = is_armed_;
         if (is_armed_) {
@@ -319,7 +319,7 @@ bool Motor::setup() {
     constexpr float max_output_swing = 1.35f; // [V] out of amplifier
     float max_unity_gain_current = kMargin * max_output_swing * shunt_conductance_; // [A]
     float requested_gain = max_unity_gain_current / config_.requested_current_range; // [V/V]
-    
+
     float actual_gain;
     if (!gate_driver_.config(requested_gain, &actual_gain))
         return false;
@@ -475,7 +475,7 @@ bool Motor::measure_phase_inductance(float test_voltage) {
     disarm();
 
     config_.phase_inductance = control_law.get_inductance();
-    
+
     // TODO arbitrary values set for now
     if (!(config_.phase_inductance >= 2e-6f && config_.phase_inductance <= 4000e-6f)) {
         error_ |= ERROR_PHASE_INDUCTANCE_OUT_OF_RANGE;
@@ -504,7 +504,7 @@ bool Motor::run_calibration() {
     }
 
     update_current_controller_gains();
-    
+
     is_calibrated_ = true;
     return true;
 }
@@ -583,7 +583,7 @@ void Motor::update(uint32_t timestamp) {
 
         vq += *phase_vel * (2.0f/3.0f) * (config_.torque_constant / config_.pole_pairs);
     }
-    
+
     if (axis_->motor_.config_.motor_type == Motor::MOTOR_TYPE_GIMBAL) {
         // reinterpret current as voltage
         Vdq_setpoint_ = {vd + id, vq + iq};
